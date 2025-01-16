@@ -77,6 +77,14 @@ def prerty_card_print(hand):
 
     return combined_text
 
+# def deck_joueur():
+#     deck= Deck()
+#     hand = []
+#     for i in range(6):
+#         str_cards= [iint_to_str(card) for card in deck.draw(2)]
+#         content= [afficher_carte(card[0],card[1]) for card in str_cards]
+#         hand.append(content)
+#     print(hand)
 
 
 creation_terrain_de_jeu()
