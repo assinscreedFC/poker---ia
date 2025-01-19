@@ -4,6 +4,7 @@ from rich.panel import Panel
 from rich.table import Table as tb
 from rich.live import Live
 from rich.prompt import Prompt
+import sys
 import keyboard # type: ignore
 import Game
 import Table
@@ -11,33 +12,57 @@ import time
 import asyncio
 #pour l'instant il ne faut pas laisser une touche appuyer trop longtemps
 console=Console()
+#event = keyboard.read_event()
 
-def print_choice(player,tm):
-    table2 = tb(box=None,expand=True)
-    table2.add_column(
-            Panel(
-                Text(f"\nRaise (r)\tFold (f)\tCall (c)\tCheck (k)\n \nseconds remaining: {tm}",justify="center",style="yellow white",),
-                style="yellow white",
-                title=f"[bold yellow]choice for player {player}[/bold yellow]"
-            ),
-            justify="center",
-            width=120
-        )
-    return table2
+def convert(nbr):
+    if nbr.isdigit():
+        return int(nbr)
+    else:
+        try:
+        # Essayer de convertir la valeur en float
+            return float(nbr)
+            
+        except ValueError:
+        # Si une erreur se produit (valeur non convertible en float)
+            return False
 
 # Fonction pour gérer le timer
-async def timer(game):
-    tm=20
-    with Live(print_choice(game.current_player,tm),refresh_per_second=1) as live:
-        while tm >= 0:
-            live.update(print_choice(game.current_player,tm))
-            if keyboard.is_pressed("r"):
-                pr=await Prompt.ask("how much do you want to raise",default="0")
-                console.print(f"player {game.current_player} raised {pr}")
-                break
-                time.sleep(0.2)
+def timer(game):
+    
+    more=""
 
-            time.sleep(1)
+    tm=20*100
+    tmm=20
+    with Live(Table.print_choice(game.current_player,tmm),refresh_per_second=4) as live:
+        
+        while tm >= 0:
+            
+            if keyboard.is_pressed("r") and more!="raise\n":
+                more="raise"
+                nbr=0              
+                nb=Prompt.ask("aa")
+                more=nb
+                if(convert(nb)!=False):
+                    
+                    
+                    nbr=convert(nb)
+                
+
+            if keyboard.is_pressed("f") and more!="fold\n":
+                more="fold\n"
+            if keyboard.is_pressed("c") and more!="call\n":
+                more="call\n"
+            if keyboard.is_pressed("k") and more!="check\n":
+                more="check\n"
+
+            if tm%100==0:
+                live.update(Table.print_choice(game.current_player,tmm,more),refresh=True)
+                tmm-=1
+            
+                
+
+            time.sleep(1/100)
+            
             tm -= 1
     
 
@@ -65,7 +90,7 @@ def main():
     
     running=False
     Table.creation_terrain_de_jeu(game)
-    async timer(game)
+    timer(game)
 
     while running:
 

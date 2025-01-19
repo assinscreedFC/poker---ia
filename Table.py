@@ -34,9 +34,25 @@ def creation_terrain_de_jeu(game):
     console = Console()
     console.print(table1, justify="center")
     console.print(table2, justify="center")
+#afficher les choix des joueurs
+def print_choice(player,tm,more_text=None):
+    table2 = Table(box=None,expand=True)
+    table2.add_column(
+            Panel(
+                Text(f"\nRaise (r)\tFold (f)\tCall (c)\tCheck (k)\n \n"
+                     f"{""if more_text==None else more_text + "\n"}"
+                     f"seconds remaining: {tm}\n"
+                     
+                     ,justify="center",style="yellow white",),
+                style="yellow white",
+                title=f"[bold yellow]choice for player {player}[/bold yellow]"
+            ),
+            justify="center",
+            max_width=120
+        )
+    return table2
 
-
-
+#---------------------------------fonction pour afficher les cartes jolie---------------------------------
 
 INT_SUIT_TO_CHAR_SUIT = 'xshxdxxxc'
 STR_RANKS = '23456789TJQKA'
@@ -72,7 +88,7 @@ def prerty_card_print(hand):
     # Créer un panel avec le texte combiné
 
     return combined_text
-
+#---------------------------------------------------------------------------------------------------
 # def deck_joueur():
 #     deck= Deck()
 #     hand = []
