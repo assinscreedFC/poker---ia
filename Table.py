@@ -6,32 +6,28 @@ from deuces import Deck
 from rich.text import Text
 
 
-def creation_terrain_de_jeu():
-    hand = [
-   Card.new('Qs'),
-   Card.new('Th'),
-    ]
+def creation_terrain_de_jeu(game):
     # Créer un tableau principal
     table1 = Table(box=None)
     # Définir les couleurs pour chaque joueur
     colors = ["red", "blue", "green", "magenta", "cyan", "white"]
 
-    for i in range(1, 7):  # 6 cellules
+    for i in range(game.players):  # 6 cellules
         table1.add_column(
             Panel(
-                Text("\n ")+ prerty_card_print(hand),
+                Text("\n ")+ prerty_card_print(game.hand_of_players[i])+Text("\n\n")+Text("jeton: 123"),
                 height=6,
-                title=f"[bold {colors[i-1]}]player {i}[/bold {colors[i-1]}]", 
-                style=f"{colors[i-1]}"  
+                title=f"[bold {colors[i]}]player {i+1} {"D" if i==game.who_is_who[0] else "SM" if i==game.who_is_who[1] else "BB" if i==game.who_is_who[2] else "" }[/bold {colors[i]}]", 
+                style=f"{colors[i]}"  
             ),
             vertical="middle",
             justify="center",
             width=20,
-        )
+        )#n'ayant pas de meilleut solution pour les condition ternaire j'ai du faire comme ca
     
     table2 = Table(box=None)
 
-    table2.add_column(Panel(Text("\n") + prerty_card_print(hand), height=5, title="[bold yellow]table[/bold yellow]",style="yellow"), justify="center",min_width=120)
+    table2.add_column(Panel(Text("\n") + prerty_card_print(game.table)+Text("\n\n")+Text("pot: 123"), height=6, title="[bold yellow]table[/bold yellow]",style="yellow"), justify="center",min_width=120)
 
     
 
@@ -60,7 +56,7 @@ def gget_suit_int(card_int):
 #couleurs = {"h": "red", "d": "red", "c": "green", "s": "blue"}
 def afficher_carte(valeur, couleur):
     symboles = {"h": "♥", "d": "♦", "c": "♣", "s": "♠"}
-    couleurs = {"h": "red", "d": "red", "c": "green", "s": "blue"}
+    couleurs = {"h": "red", "d": "black", "c": "green", "s": "blue"}
     if valeur == "T":
         valeur = "10"
     texte = Text(f"{valeur} {symboles[couleur]}", style=couleurs[couleur])
@@ -86,5 +82,3 @@ def prerty_card_print(hand):
 #         hand.append(content)
 #     print(hand)
 
-
-creation_terrain_de_jeu()
