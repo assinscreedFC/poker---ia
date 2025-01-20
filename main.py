@@ -9,10 +9,9 @@ import keyboard # type: ignore
 import Game
 import Table
 import time
-import asyncio
-#pour l'instant il ne faut pas laisser une touche appuyer trop longtemps
+import sys
+
 console=Console()
-#event = keyboard.read_event()
 
 def convert(nbr):
     if nbr.isdigit():
@@ -26,27 +25,42 @@ def convert(nbr):
         # Si une erreur se produit (valeur non convertible en float)
             return False
 
+def handle_key(event):
+    print(f"Touche pressée : {event.name}")
+    if event.name == "a":
+        print("Action spéciale pour la touche 'a'.")
+        return True  # Bloque la touche
+
+# Ajouter un listener avec suppression
+keyboard.on_press(handle_key, suppress=True)
 # Fonction pour gérer le timer
-def timer(game):
+def timer(game,tmm):
     
     more=""
-
-    tm=20*100
-    tmm=20
+    nbr=0
+    if tmm!=20:
+        
+        nb=Prompt.ask("a")
+        more=nb
+        if(convert(nb)!=False):
+            nbr=convert(nb)
+    
+    tm=tmm*100
     with Live(Table.print_choice(game.current_player,tmm),refresh_per_second=4) as live:
         
         while tm >= 0:
             
-            if keyboard.is_pressed("r") and more!="raise\n":
-                more="raise"
-                nbr=0              
-                nb=Prompt.ask("aa")
-                more=nb
-                if(convert(nb)!=False):
-                    
-                    
-                    nbr=convert(nb)
+            if keyboard.is_pressed("r"): 
+                nb=0
+                keyboard.wait("a",suppress=False)
+                while keyboard.is_pressed("r"):
+                    pass
                 
+                more="raise"
+                live.update("",refresh=True)
+                live.stop()
+                timer(game,tmm-1)
+                return
 
             if keyboard.is_pressed("f") and more!="fold\n":
                 more="fold\n"
@@ -59,12 +73,10 @@ def timer(game):
                 live.update(Table.print_choice(game.current_player,tmm,more),refresh=True)
                 tmm-=1
             
-                
-
             time.sleep(1/100)
-            
             tm -= 1
-    
+    print("anis")
+    return
 
 # Fonction pour gérer l'input de l'utilisateur
 
@@ -90,14 +102,14 @@ def main():
     
     running=False
     Table.creation_terrain_de_jeu(game)
-    timer(game)
+    timer(game,20)
 
     while running:
 
         if keyboard.is_pressed("q"):
+            while keyboard.is_pressed('p'): pass
             console.clear()
             console.print(Text("au revoir !"), justify="center" ,style="bold red")
-            time.sleep(0.1)
             return
         
         
