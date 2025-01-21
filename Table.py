@@ -1,12 +1,39 @@
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
-from deuces import Card
-from deuces import Deck
 from rich.text import Text
+import keyboard # type: ignore
+from rich.live import Live
+from rich.prompt import Prompt
+import time
 
 
-def creation_terrain_de_jeu(game):
+
+
+def intro_jeu(console):
+    #afficher l'introduction du jeu
+    #la touche k a etait choisi pour check car c etait deja pris par call
+    tx_intro=[Text("for raise click r",justify="right"),Text("for fold click f",justify="left"),Text("for call click c"),Text("for check click k")]
+    
+    console.print(Text("Bienvenue au jeu de poker\n"), justify="center",style="bold red")
+    console.print(Text("je vous informe de certaine chose tout d'abord a toute instant pour mettre pause le jeux vous pouvez appuiez sur la touche p"), justify="center")
+    merged_text =Text("\n").join(tx_intro)
+    table1 = Table(box=None,padding=(2,2))
+    table1.add_column(
+    Panel(
+                merged_text, 
+            ),
+            
+            justify="center",
+            min_width=30 
+            
+        )
+    console.print(table1, justify="center")
+
+
+
+
+def creation_terrain_de_jeu(console,game):
     # Créer un tableau principal
     table1 = Table(box=None)
     # Définir les couleurs pour chaque joueur
@@ -31,11 +58,12 @@ def creation_terrain_de_jeu(game):
 
     
 
-    console = Console()
+    
     console.print(table1, justify="center")
     console.print(table2, justify="center")
-#afficher les choix des joueurs
+
 def print_choice(player,tm,more_text=None):
+    #afficher les choix des joueurs
     table2 = Table(box=None,expand=True)
     table2.add_column(
             Panel(
@@ -98,3 +126,52 @@ def prerty_card_print(hand):
 #         hand.append(content)
 #     print(hand)
 
+
+def timer(console,game,tmm):
+    # Fonction pour gérer le timer
+    more=""
+    nbr=""#initialise comme chaine de caractere pour que la boucle while se lance
+    if tmm!=20:
+        console.clear()
+        nbr=Prompt.ask("entrer la valeur de la mise")
+        console.clear()
+        while game.convert(nbr)==False:
+
+            nbr=Prompt.ask("entrer une valeur reel positif s'il vous plait superieur strictement a la dernier mise",default="0")
+            console.clear()
+            more=nbr
+
+    else:
+        keyboard.block_key("r")
+    tm=tmm*100
+    with Live(Table.print_choice(game.current_player,tmm),refresh_per_second=4) as live:
+        
+        while tm >= 0:
+            
+            if keyboard.is_pressed("r"): 
+                nb=0
+                while keyboard.is_pressed("r"):
+
+                    pass
+                keyboard.unblock_key("r")
+                more="raise"
+                live.update("",refresh=True)
+                live.stop()
+                timer(game,tmm-1)
+                return
+
+            if keyboard.is_pressed("f") and more!="fold\n":
+                more="fold\n"
+            if keyboard.is_pressed("c") and more!="call\n":
+                more="call\n"
+            if keyboard.is_pressed("k") and more!="check\n":
+                more="check\n"
+
+            if tm%100==0:
+                live.update(Table.print_choice(game.current_player,tmm,more),refresh=True)
+                tmm-=1
+            
+            time.sleep(1/100)
+            tm -= 1
+    print("anis")
+    return

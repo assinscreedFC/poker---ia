@@ -1,5 +1,5 @@
-from deuces import Card
-from deuces import Deck
+from deuces import Card # type: ignore
+from deuces import Deck # type: ignore
 
 
 
@@ -28,4 +28,16 @@ class game:
     
     def get_players(self):
         return self.players
+    
+    def convert(nbr):
+        # Fonction pour convertir une valeur en float ou en int
+        if nbr.isdigit():
+            return int(nbr) if int(nbr)>0 else False
+        else:
+            try:
+            # Essayer de convertir la valeur en float
+                return float(nbr) if float(nbr)>0 else False
+            except ValueError:
+            # Si une erreur se produit (valeur non convertible en float)
+                return False
     
