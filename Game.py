@@ -1,5 +1,6 @@
 from deuces import Card # type: ignore
 from deuces import Deck # type: ignore
+from Table import Table
 
 
 
@@ -12,12 +13,13 @@ class game:
         self.players = 6 #nombre de joueur sur la table 1-6
         self.hand_of_players = [self.deck.draw(2) for _ in range(self.players)] #pour avoir les cartes de chaque joueur
         self.coin =[1000 for _ in range(self.players)] #pour avoir le nombre de jeton de chaque joueur
-        self.current_player = 0
         self.who_is_who=[0,1,2] #pour savoir qui est le bouton , le small blind et la big blind
         self.big_blind=10
         self.small_blind=5
+        self.current_player=0
         self.pot = 0
-        self.nb=[0,3,4,5] #pour savoir combien de carte sont sur la table a chaque tour pre-flop, flop, turn, river
+        self.bet=self.big_blind
+        self.nb=[0,3,4,5] # pour savoir combien de carte sont sur la table a chaque tour pre-flop, flop, turn, river
 
 
     def get_hand(self):
@@ -28,7 +30,6 @@ class game:
     
     def get_players(self):
         return self.players
-    
     def convert(nbr):
         # Fonction pour convertir une valeur en float ou en int
         if nbr.isdigit():
@@ -40,4 +41,28 @@ class game:
             except ValueError:
             # Si une erreur se produit (valeur non convertible en float)
                 return False
+    def choix_joueur(self):
+        choice=Table.timer()
+        if choice=="fold":
+            self.hand_of_players[self.current_player]=[]
+            return True
+        elif choice=="check" and self.bet==0:
+            return True
+
+        elif choice=="call":
+            if(self.coin[self.current_player]>=self.bet):
+                self.coin[self.current_player]-=self.bet
+                self.pot+=self.bet
+                return True                
+        elif self.convert(choice):
+            if self.coin[self.current_player]>=self.bet:
+                self.coin[self.current_player]-=self.bet
+                self.pot+=self.bet
+                return True
+        return False
+
+    def rounde(self):
+        # Fonction pour gérer le tour de jeu
+        for etap in self.nb:
+            self.choix_joueur()
     

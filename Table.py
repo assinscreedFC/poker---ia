@@ -1,4 +1,3 @@
-from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
 from rich.text import Text
@@ -62,12 +61,12 @@ def creation_terrain_de_jeu(console,game):
     console.print(table1, justify="center")
     console.print(table2, justify="center")
 
-def print_choice(player,tm,more_text=None):
+def print_choice(player,bet,tm,more_text=None):
     #afficher les choix des joueurs
     table2 = Table(box=None,expand=True)
     table2.add_column(
             Panel(
-                Text(f"\nRaise (r)\tFold (f)\tCall (c)\tCheck (k)\n \n"
+                Text(f"\nRaise (r)\tFold (f)\tCall (c)\t{"Check (k)" if bet==0 else ""} \n \n"
                      f"{""if more_text==None else more_text + "\n"}"
                      f"seconds remaining: {tm}\n"
                      
@@ -135,7 +134,7 @@ def timer(console,game,tmm):
         console.clear()
         nbr=Prompt.ask("entrer la valeur de la mise")
         console.clear()
-        while game.convert(nbr)==False:
+        while game.convert(nbr)==False and nbr>game.bet:
 
             nbr=Prompt.ask("entrer une valeur reel positif s'il vous plait superieur strictement a la dernier mise",default="0")
             console.clear()
@@ -144,7 +143,7 @@ def timer(console,game,tmm):
     else:
         keyboard.block_key("r")
     tm=tmm*100
-    with Live(Table.print_choice(game.current_player,tmm),refresh_per_second=4) as live:
+    with Live(print_choice(game.current_player,game.bet,tmm),refresh_per_second=4) as live:
         
         while tm >= 0:
             
@@ -162,13 +161,16 @@ def timer(console,game,tmm):
 
             if keyboard.is_pressed("f") and more!="fold\n":
                 more="fold\n"
+                return "fold"
             if keyboard.is_pressed("c") and more!="call\n":
                 more="call\n"
-            if keyboard.is_pressed("k") and more!="check\n":
+                return game.bet
+            if keyboard.is_pressed("k") and more!="check\n" and game.bet==0:
                 more="check\n"
+                return "check"
 
             if tm%100==0:
-                live.update(Table.print_choice(game.current_player,tmm,more),refresh=True)
+                live.update(print_choice(game.current_player,game.bet,tmm,more),refresh=True)
                 tmm-=1
             
             time.sleep(1/100)
