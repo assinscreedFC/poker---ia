@@ -60,8 +60,20 @@ class Game:
         return self.stop_to_player==self.current_player
     def next_etape(self):
         self.etape+=1
+        if self.etape==len(self.nb):
+            self.check_winner_rounde()
         self.bet=0
-        
+    
+    def check_winner_rounde(self):
+        self.deck = Deck()
+        self.table = self.deck.draw(5)
+        self.hand_of_players = [self.deck.draw(2) for _ in range(self.players)]
+        self.bet=self.big_blind
+        self.current_player=self.who_is_who[0]
+        self.stop_to_player=self.current_player-1 if self.current_player>0 else self.players-1
+        for who in self.who_is_who:
+            who=who+1 if who<self.players-1 else 0
+
 
 
     def next_player(self):
