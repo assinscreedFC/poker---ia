@@ -36,11 +36,11 @@ async def main():
             return
         if game.check_if_stop_rounde():
             game.next_etape()
-            Table.creation_terrain_de_jeu(console,game)
-        else:
-            choice= Table.timer(console,game,TIME_OF_ROUNDE)
-            game.choix_joueur(choice)
-            Table.creation_terrain_de_jeu(console,game)
+        
+        
+        choice= Table.timer(console,game,TIME_OF_ROUNDE)
+        game.choix_joueur(choice)
+        Table.creation_terrain_de_jeu(console,game)
         sleep(0.2)
     
 
