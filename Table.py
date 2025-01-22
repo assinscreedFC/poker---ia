@@ -68,7 +68,7 @@ def print_choice(player,bet,coin,tm,more_text=None):
     table2 = Table(box=None,expand=True)
     table2.add_column(
             Panel(
-                Text(f"\n{"Raise (r)" if coin>bet else ""}\tFold (f)\tCall (c)\t{"Check (k)" if bet==0 else ""} \n \n"
+                Text(f"\n{"Raise (r)" if coin>bet else "all in (A)"}\tFold (f)\t{"Call (c)" if coin>=bet else""}\t{"Check (k)" if bet==0 else ""} \n \n"
                      f"{""if more_text==None else more_text + "\n"}"
                      f"seconds remaining: {tm}\n"
                      
@@ -128,38 +128,43 @@ def prerty_card_print(hand):
 #     print(hand)
 
 
+def place_the_bet(console,game):
+    nbr=""#initialise comme chaine de caractere pour que la boucle while se lance
+    console.clear()
+    nbr=Prompt.ask("entrer la valeur de la mise")
+    console.clear()
+    while game.convert(nbr)==False or game.convert(nbr)<=game.bet:
+
+        nbr=Prompt.ask("entrer une valeur reel positif s'il vous plait superieur strictement a la dernier mise",default="0")
+        console.clear()
+        more=nbr
+
+    return nbr
+    
+
 def timer(console,game,tmm):
     # Fonction pour gérer le timer du jeu et permettre aux joueurs de choisir leur action
     more=""
-    nbr=""#initialise comme chaine de caractere pour que la boucle while se lance
-    if tmm!=20:
-        console.clear()
-        nbr=Prompt.ask("entrer la valeur de la mise")
-        console.clear()
-        while game.convert(nbr)==False and nbr>game.bet:
-
-            nbr=Prompt.ask("entrer une valeur reel positif s'il vous plait superieur strictement a la dernier mise",default="0")
-            console.clear()
-            more=nbr
-
-    else:
-        keyboard.block_key("f")
+    keyboard.block_key("r")
     tm=tmm*100
     with Live(print_choice(game.current_player,game.bet,game.coin[game.current_player],tmm),refresh_per_second=4) as live:
         
         while tm >= 0:
             
             if keyboard.is_pressed("r") and game.coin[game.current_player]>game.bet: 
-                nb=0
                 while keyboard.is_pressed("r"):
-
                     pass
                 keyboard.unblock_key("r")
                 more="raise"
                 stop_live(live)
-                timer(game,tmm-1)
-                return
+                
+                return place_the_bet(console,game)
 
+            if keyboard.is_pressed("a") and game.coin[game.current_player]<=game.bet:
+                more="all"
+                stop_live(live)
+                return "all"
+            
             if keyboard.is_pressed("f") and more!="fold\n":
                 more="fold\n"
                 stop_live(live)
@@ -168,7 +173,7 @@ def timer(console,game,tmm):
             if keyboard.is_pressed("c") and more!="call\n":
                 more="call\n"
                 stop_live(live)
-                return game.bet
+                return str(game.bet)
             if keyboard.is_pressed("k") and more!="check\n" and game.bet==0:
                 more="check\n"
                 stop_live(live)
@@ -180,6 +185,7 @@ def timer(console,game,tmm):
             
             time.sleep(1/100)
             tm -= 1
+    return "fold"
 
 def stop_live(live):
     live.update("",refresh=True)

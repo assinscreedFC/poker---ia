@@ -12,12 +12,13 @@ console=Console()
 
 
 
-
 # Fonction pour gérer l'input de l'utilisateur
 
-async def main():
+def main():
     Table.intro_jeu(console)
+    
     keyboard.wait("Enter")
+    console.input()
     console.clear()
     game=Game()
     
@@ -46,4 +47,4 @@ async def main():
     
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()

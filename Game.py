@@ -19,13 +19,14 @@ class Game:
         self.small_blind=5
         self.current_player=0
         self.pot = 0
+        self.under_bet=[]#who have coin < bet 
         self.stop_to_player=5
         self.bet=self.big_blind
         self.nb=[0,3,4,5] # pour savoir combien de carte sont sur la table a chaque tour pre-flop, flop, turn, river
         self.etape=0
 
     
-    def convert(nbr):
+    def convert(self,nbr):
         # Fonction pour convertir une valeur en float ou en int
         if nbr.isdigit():
             return int(nbr) if int(nbr)>0 else False
@@ -36,7 +37,7 @@ class Game:
             except ValueError:
             # Si une erreur se produit (valeur non convertible en float)
                 return False
-
+    
     def choix_joueur(self,choice=""):
         if choice=="fold":
             self.hand_of_players[self.current_player]=[]
@@ -50,9 +51,13 @@ class Game:
                                
         elif self.convert(choice):
             if self.coin[self.current_player]>=self.bet:
+                self.bet=self.convert(choice)
                 self.coin[self.current_player]-=self.bet
                 self.pot+=self.bet
                 self.stop_to_player=self.current_player
+        elif choice=="all":
+                self.pot+=self.coin[self.current_player]
+                self.coin[self.current_player]=0
 
         self.next_player()
 
@@ -63,7 +68,7 @@ class Game:
         if self.etape==len(self.nb):
             self.check_winner_rounde()
         self.bet=0
-    
+
     def check_winner_rounde(self):
         self.deck = Deck()
         self.table = self.deck.draw(5)
