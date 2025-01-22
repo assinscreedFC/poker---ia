@@ -58,6 +58,7 @@ class Game:
         elif choice=="all":
                 self.pot+=self.coin[self.current_player]
                 self.coin[self.current_player]=0
+                self.under_bet.append(self.current_player)
 
         self.next_player()
 
