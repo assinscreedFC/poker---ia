@@ -39,9 +39,11 @@ def creation_terrain_de_jeu(console,game):
     colors = ["red", "blue", "green", "magenta", "cyan", "white"]
 
     for i in range(game.players):  # 6 cellules
+        if len(game.hand_of_players[i])==0:
+            continue
         table1.add_column(
             Panel(
-                Text("\n ")+ prerty_card_print(game.hand_of_players[i])+Text("\n\n")+Text("jeton: 123"),
+                Text("\n ")+ prerty_card_print(game.hand_of_players[i])+Text("\n\n")+Text(f"jeton: {game.coin[i]}"),
                 height=6,
                 title=f"[bold {colors[i]}]player {i+1} {"D" if i==game.who_is_who[0] else "SM" if i==game.who_is_who[1] else "BB" if i==game.who_is_who[2] else "" }[/bold {colors[i]}]", 
                 style=f"{colors[i]}"  
@@ -53,7 +55,7 @@ def creation_terrain_de_jeu(console,game):
     
     table2 = Table(box=None)
 
-    table2.add_column(Panel(Text("\n") + prerty_card_print(game.table)+Text("\n\n")+Text("pot: 123"), height=6, title="[bold yellow]table[/bold yellow]",style="yellow"), justify="center",min_width=120)
+    table2.add_column(Panel(Text("\n") + prerty_card_print(game.table[i] for i in range(game.nb[game.etape]) )+Text("\n\n")+Text(f"pot: {game.pot}"), height=6, title="[bold yellow]table[/bold yellow]",style="yellow"), justify="center",min_width=120)
 
     
 
@@ -72,7 +74,7 @@ def print_choice(player,bet,coin,tm,more_text=None):
                      
                      ,justify="center",style="yellow white",),
                 style="yellow white",
-                title=f"[bold yellow]choice for player {player}[/bold yellow]"
+                title=f"[bold yellow]choice for player {player+1}[/bold yellow]"
             ),
             justify="center",
             max_width=120

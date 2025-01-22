@@ -34,14 +34,15 @@ async def main():
             console.clear()
             console.print(Text("au revoir !"), justify="center" ,style="bold red")
             return
-        if game.check_if_stop_rounde():
-            game.next_etape()
+        
         
         
         choice= Table.timer(console,game,TIME_OF_ROUNDE)
         game.choix_joueur(choice)
         Table.creation_terrain_de_jeu(console,game)
         sleep(0.2)
+        if game.check_if_stop_rounde():
+            game.next_etape()
     
 
 if __name__ == "__main__":
