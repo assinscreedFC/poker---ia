@@ -1,10 +1,11 @@
 from deuces import Card # type: ignore
 from deuces import Deck # type: ignore
 from Table import Table
+import asyncio
 
 
 
-class game:
+class Game:
 
 
     def __init__(self):
@@ -18,18 +19,12 @@ class game:
         self.small_blind=5
         self.current_player=0
         self.pot = 0
+        self.stop_to_player=5
         self.bet=self.big_blind
         self.nb=[0,3,4,5] # pour savoir combien de carte sont sur la table a chaque tour pre-flop, flop, turn, river
+        self.etape=0
 
-
-    def get_hand(self):
-        return self.hand_of_players
-
-    def get_table(self):
-        return self.table
     
-    def get_players(self):
-        return self.players
     def convert(nbr):
         # Fonction pour convertir une valeur en float ou en int
         if nbr.isdigit():
@@ -41,28 +36,41 @@ class game:
             except ValueError:
             # Si une erreur se produit (valeur non convertible en float)
                 return False
-    def choix_joueur(self):
-        choice=Table.timer()
+
+    def choix_joueur(self,choice=""):
         if choice=="fold":
             self.hand_of_players[self.current_player]=[]
-            return True
+            
         elif choice=="check" and self.bet==0:
-            return True
-
+            pass
         elif choice=="call":
             if(self.coin[self.current_player]>=self.bet):
                 self.coin[self.current_player]-=self.bet
                 self.pot+=self.bet
-                return True                
+                               
         elif self.convert(choice):
             if self.coin[self.current_player]>=self.bet:
                 self.coin[self.current_player]-=self.bet
                 self.pot+=self.bet
-                return True
-        return False
+                self.stop_to_player=self.current_player
+
+        self.next_player()
+
+    def check_if_stop_rounde(self):
+        return self.stop_to_player==self.current_player
+    def next_etape(self):
+        self.etape+=1
+        self.bet=0
+        
+
+
+    def next_player(self):
+        self.current_player=(self.current_player+1) if self.current_player<self.players-1 else 0
 
     def rounde(self):
         # Fonction pour gérer le tour de jeu
         for etap in self.nb:
+
+            
             self.choix_joueur()
     

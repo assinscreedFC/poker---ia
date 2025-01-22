@@ -1,8 +1,10 @@
 from rich.console import Console
 from rich.text import Text
 import keyboard # type: ignore
-import Game
+from Game import Game
 import Table
+import asyncio
+from time import sleep
 
 TIME_OF_ROUNDE=20
 
@@ -13,29 +15,34 @@ console=Console()
 
 # Fonction pour gérer l'input de l'utilisateur
 
-def main():
+async def main():
     Table.intro_jeu(console)
     keyboard.wait("Enter")
     console.clear()
-    game=Game.game()
+    game=Game()
     
     
-    running=False
+    running=True
     Table.creation_terrain_de_jeu(console,game)
-    Table.timer(console,game,TIME_OF_ROUNDE)
+    
 
     while running:
 
         if keyboard.is_pressed("q"):
-
+    
             while keyboard.is_pressed('p'): pass
             console.clear()
             console.print(Text("au revoir !"), justify="center" ,style="bold red")
             return
-        
-        
-    
+        if game.check_if_stop_rounde():
+            game.next_etape()
+            Table.creation_terrain_de_jeu(console,game)
+        else:
+            choice= Table.timer(console,game,TIME_OF_ROUNDE)
+            game.choix_joueur(choice)
+            Table.creation_terrain_de_jeu(console,game)
+        sleep(0.2)
     
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

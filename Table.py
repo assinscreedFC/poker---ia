@@ -5,7 +5,7 @@ import keyboard # type: ignore
 from rich.live import Live
 from rich.prompt import Prompt
 import time
-
+import asyncio
 
 
 
@@ -61,12 +61,12 @@ def creation_terrain_de_jeu(console,game):
     console.print(table1, justify="center")
     console.print(table2, justify="center")
 
-def print_choice(player,bet,tm,more_text=None):
+def print_choice(player,bet,coin,tm,more_text=None):
     #afficher les choix des joueurs
     table2 = Table(box=None,expand=True)
     table2.add_column(
             Panel(
-                Text(f"\nRaise (r)\tFold (f)\tCall (c)\t{"Check (k)" if bet==0 else ""} \n \n"
+                Text(f"\n{"Raise (r)" if coin>bet else ""}\tFold (f)\tCall (c)\t{"Check (k)" if bet==0 else ""} \n \n"
                      f"{""if more_text==None else more_text + "\n"}"
                      f"seconds remaining: {tm}\n"
                      
@@ -127,7 +127,7 @@ def prerty_card_print(hand):
 
 
 def timer(console,game,tmm):
-    # Fonction pour gérer le timer
+    # Fonction pour gérer le timer du jeu et permettre aux joueurs de choisir leur action
     more=""
     nbr=""#initialise comme chaine de caractere pour que la boucle while se lance
     if tmm!=20:
@@ -141,39 +141,45 @@ def timer(console,game,tmm):
             more=nbr
 
     else:
-        keyboard.block_key("r")
+        keyboard.block_key("f")
     tm=tmm*100
-    with Live(print_choice(game.current_player,game.bet,tmm),refresh_per_second=4) as live:
+    with Live(print_choice(game.current_player,game.bet,game.coin[game.current_player],tmm),refresh_per_second=4) as live:
         
         while tm >= 0:
             
-            if keyboard.is_pressed("r"): 
+            if keyboard.is_pressed("r") and game.coin[game.current_player]>game.bet: 
                 nb=0
                 while keyboard.is_pressed("r"):
 
                     pass
                 keyboard.unblock_key("r")
                 more="raise"
-                live.update("",refresh=True)
-                live.stop()
+                stop_live(live)
                 timer(game,tmm-1)
                 return
 
             if keyboard.is_pressed("f") and more!="fold\n":
                 more="fold\n"
+                stop_live(live)
+
                 return "fold"
             if keyboard.is_pressed("c") and more!="call\n":
                 more="call\n"
+                stop_live(live)
                 return game.bet
             if keyboard.is_pressed("k") and more!="check\n" and game.bet==0:
                 more="check\n"
+                stop_live(live)
                 return "check"
 
             if tm%100==0:
-                live.update(print_choice(game.current_player,game.bet,tmm,more),refresh=True)
+                live.update(print_choice(game.current_player,game.bet,game.coin[game.current_player],tmm,more),refresh=True)
                 tmm-=1
             
             time.sleep(1/100)
             tm -= 1
-    print("anis")
-    return
+
+def stop_live(live):
+    live.update("",refresh=True)
+    live.stop()
+    live.console.clear()
