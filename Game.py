@@ -18,13 +18,17 @@ class Game:
         self.who_is_who=[0,1,2] #pour savoir qui est le bouton , le small blind et la big blind
         self.big_blind=10
         self.small_blind=5
-        self.current_player=0
+        
         self.pot = 0
         self.under_bet=[]#who have coin < bet 
         self.stop_to_player=0
         self.bet=self.big_blind
         self.nb=[0,3,4,5] # pour savoir combien de carte sont sur la table a chaque tour pre-flop, flop, turn, river
         self.etape=0
+        self.coin[self.who_is_who[1]]-=self.small_blind
+        self.coin[self.who_is_who[2]]-=self.big_blind
+        self.current_player=self.who_is_who[2]+1 if self.who_is_who[2]<self.players-1 else 0
+
 
     
     def convert(self,nbr):
@@ -43,7 +47,7 @@ class Game:
         # Fonction pour gérer le choix du joueur
         if choice=="fold":
             self.hand_of_players[self.current_player]=[]
-            self.increment()
+            
             
         elif choice=="check" and self.bet==0:
             self.increment()
@@ -99,8 +103,8 @@ class Game:
 
     def check_winner_rounde(self):
         # Fonction pour vérifier le gagnant de la ronde
-        evaluate=Evaluator()
-        score_each_player=[evaluate(self.table,player) for player in self.hand_of_players]
+        evaluator= Evaluator()
+        score_each_player=[evaluator.evaluate(self.table,player) for player in self.hand_of_players]
         winner=score_each_player.index(min(score_each_player))
         self.coin[winner]+=self.pot
         self.pot=0
@@ -109,8 +113,11 @@ class Game:
         self.table = self.deck.draw(5)
         self.hand_of_players = [self.deck.draw(2) for _ in range(self.players)]
         self.bet=self.big_blind
-        self.current_player=self.who_is_who[0]
-        self.stop_to_player=self.current_player-1 if self.current_player>0 else self.players-1
-        for who in self.who_is_who:
-            who=who+1 if who<self.players-1 else 0
+        
+        self.stop_to_player=0
+        for i in range(len(self.who_is_who)):
+            self.who_is_who[i]=self.who_is_who[i]+1 if self.who_is_who[i]<self.players-1 else 0
+        self.coin[self.who_is_who[1]]-=self.small_blind
+        self.coin[self.who_is_who[2]]-=self.big_blind
+        self.current_player=self.who_is_who[2]+1 if self.who_is_who[2]<self.players-1 else 0
     

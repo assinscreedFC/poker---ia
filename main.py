@@ -42,7 +42,7 @@ def main():
         choice= Table.timer(console,game,TIME_OF_ROUNDE)
         game.choix_joueur(choice)
         game.next_player()
-        sleep(0.5)
+       
         print(game.current_player)
         if game.check_if_stop_rounde():
             game.next_etape()
@@ -51,7 +51,7 @@ def main():
             game.nbr_current_player()
             print(game.stop_to_player)
         
-        sleep(0.5)
+        sleep(0.2)
         Table.creation_terrain_de_jeu(console,game)
         
         
