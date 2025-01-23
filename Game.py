@@ -21,7 +21,7 @@ class Game:
         self.current_player=0
         self.pot = 0
         self.under_bet=[]#who have coin < bet 
-        self.stop_to_player=5
+        self.stop_to_player=0
         self.bet=self.big_blind
         self.nb=[0,3,4,5] # pour savoir combien de carte sont sur la table a chaque tour pre-flop, flop, turn, river
         self.etape=0
@@ -43,46 +43,59 @@ class Game:
         # Fonction pour gérer le choix du joueur
         if choice=="fold":
             self.hand_of_players[self.current_player]=[]
-            
+            self.increment()
             
         elif choice=="check" and self.bet==0:
+            self.increment()
             pass
 
-        elif choice=="call":
-            if(self.coin[self.current_player]>=self.bet):
-                self.coin[self.current_player]-=self.bet
-                self.pot+=self.bet
+        elif choice=="call" and (self.coin[self.current_player]>=self.bet):
+            
+            self.coin[self.current_player]-=self.bet
+            self.pot+=self.bet
+            self.increment()   
                 
-                               
+        elif choice=="all":
+                self.pot+=self.coin[self.current_player]
+                self.coin[self.current_player]=0
+                self.under_bet.append(self.current_player)
+                self.increment()
         elif self.convert(choice):
             if self.coin[self.current_player]>=self.bet:
                 self.bet=self.convert(choice)
                 self.coin[self.current_player]-=self.bet
                 self.pot+=self.bet
-                self.stop_to_player=self.current_player
-        elif choice=="all":
-                self.pot+=self.coin[self.current_player]
-                self.coin[self.current_player]=0
-                self.under_bet.append(self.current_player)
-
-        self.next_player()
-    
+                self.stop_to_player=0
+                
+        
+        
+    def increment(self):
+        self.stop_to_player+=1
     def nbr_current_player(self):
         # Fonction pour retourner le nombre du joueur actuel
-        self.stop_to_player=0
+        count=0
         for hand in self.hand_of_players:
             if len(hand)!=0:
-                self.stop_to_player+=1
+                count+=1
+        return count
+        
     def check_if_stop_rounde(self):
         # Fonction pour vérifier si le tour est terminé
-        return self.stop_to_player==self.current_player
+        print(f"stop {self.stop_to_player}")
+        print(self.nbr_current_player())
+        return self.stop_to_player==self.nbr_current_player()
     def next_etape(self):
         # Fonction pour passer à l'étape suivante
+        self.stop_to_player=0
         self.etape+=1
-        self.nbr_current_player()
-        if self.etape==len(self.nb):
-            self.check_winner_rounde()
         self.bet=0
+
+    def next_player(self):
+        
+        # Fonction pour passer au joueur suivant
+        self.current_player=(self.current_player+1) if self.current_player<self.players-1 else 0
+        while len(self.hand_of_players[self.current_player])==0:
+            self.current_player=(self.current_player+1) if self.current_player<self.players-1 else 0
 
     def check_winner_rounde(self):
         # Fonction pour vérifier le gagnant de la ronde
@@ -100,19 +113,4 @@ class Game:
         self.stop_to_player=self.current_player-1 if self.current_player>0 else self.players-1
         for who in self.who_is_who:
             who=who+1 if who<self.players-1 else 0
-
-
-
-    def next_player(self):
-        # Fonction pour passer au joueur suivant
-        self.current_player=(self.current_player+1) if self.current_player<self.players-1 else 0
-        while len(self.hand_of_players[self.current_player])==0:
-            self.current_player=(self.current_player+1) if self.current_player<self.players-1 else 0
-
-    def rounde(self):
-        # Fonction pour gérer le tour de jeu
-        for etap in self.nb:
-
-            
-            self.choix_joueur()
     

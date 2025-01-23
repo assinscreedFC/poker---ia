@@ -173,7 +173,7 @@ def timer(console,game,tmm):
             if keyboard.is_pressed("c") and more!="call\n":
                 more="call\n"
                 stop_live(live)
-                return str(game.bet)
+                return "call"
             if keyboard.is_pressed("k") and more!="check\n" and game.bet==0:
                 more="check\n"
                 stop_live(live)
