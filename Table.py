@@ -130,6 +130,8 @@ def prerty_card_print(hand):
 
 def place_the_bet(console,game):
     nbr=""#initialise comme chaine de caractere pour que la boucle while se lance
+    keyboard.send("Enter")
+    input()
     console.clear()
     nbr=Prompt.ask("entrer la valeur de la mise")
     console.clear()
