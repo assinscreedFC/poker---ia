@@ -1,5 +1,6 @@
 from deuces import Card # type: ignore
 from deuces import Deck # type: ignore
+from deuces import Evaluator # type: ignore
 from Table import Table
 import asyncio
 
@@ -39,15 +40,19 @@ class Game:
                 return False
     
     def choix_joueur(self,choice=""):
+        # Fonction pour gérer le choix du joueur
         if choice=="fold":
             self.hand_of_players[self.current_player]=[]
             
+            
         elif choice=="check" and self.bet==0:
             pass
+
         elif choice=="call":
             if(self.coin[self.current_player]>=self.bet):
                 self.coin[self.current_player]-=self.bet
                 self.pot+=self.bet
+                
                                
         elif self.convert(choice):
             if self.coin[self.current_player]>=self.bet:
@@ -61,16 +66,32 @@ class Game:
                 self.under_bet.append(self.current_player)
 
         self.next_player()
-
+    
+    def nbr_current_player(self):
+        # Fonction pour retourner le nombre du joueur actuel
+        self.stop_to_player=0
+        for hand in self.hand_of_players:
+            if len(hand)!=0:
+                self.stop_to_player+=1
     def check_if_stop_rounde(self):
+        # Fonction pour vérifier si le tour est terminé
         return self.stop_to_player==self.current_player
     def next_etape(self):
+        # Fonction pour passer à l'étape suivante
         self.etape+=1
+        self.nbr_current_player()
         if self.etape==len(self.nb):
             self.check_winner_rounde()
         self.bet=0
 
     def check_winner_rounde(self):
+        # Fonction pour vérifier le gagnant de la ronde
+        evaluate=Evaluator()
+        score_each_player=[evaluate(self.table,player) for player in self.hand_of_players]
+        winner=score_each_player.index(min(score_each_player))
+        self.coin[winner]+=self.pot
+        self.pot=0
+        self.etape=0
         self.deck = Deck()
         self.table = self.deck.draw(5)
         self.hand_of_players = [self.deck.draw(2) for _ in range(self.players)]
@@ -83,7 +104,10 @@ class Game:
 
 
     def next_player(self):
+        # Fonction pour passer au joueur suivant
         self.current_player=(self.current_player+1) if self.current_player<self.players-1 else 0
+        while len(self.hand_of_players[self.current_player])==0:
+            self.current_player=(self.current_player+1) if self.current_player<self.players-1 else 0
 
     def rounde(self):
         # Fonction pour gérer le tour de jeu
