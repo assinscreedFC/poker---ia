@@ -65,7 +65,7 @@ class Game:
                 self.bet=self.convert(choice)
                 self.coin[self.current_player]-=self.bet
                 self.pot+=self.bet
-                self.stop_to_player=0
+                self.stop_to_player=1
                 
         
         
