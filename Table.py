@@ -38,9 +38,7 @@ def creation_terrain_de_jeu(console,game):
     # Définir les couleurs pour chaque joueur
     colors = ["red", "blue", "green", "magenta", "cyan", "white"]
 
-    for i in range(game.players):  # 6 cellules
-        if len(game.hand_of_players[i])==0:
-            continue
+    for i in range(len(game.players)):  # 6 cellules
         table1.add_column(
             Panel(
                 Text("\n ")+ prerty_card_print(game.hand_of_players[i])+Text("\n\n")+Text(f"jeton: {game.coin[i]}"),
@@ -55,7 +53,7 @@ def creation_terrain_de_jeu(console,game):
     
     table2 = Table(box=None)
 
-    table2.add_column(Panel(Text("\n") + prerty_card_print(game.table[i] for i in range(game.nb[game.etape]) )+Text("\n\n")+Text(f"pot: {game.pot}"), height=6, title="[bold yellow]table[/bold yellow]",style="yellow"), justify="center",min_width=120)
+    table2.add_column(Panel(Text("\n") + prerty_card_print(game.table[i] for i in range(game.nb[game.etape]) )+Text("\n\n")+Text(f"pots: {sum(game.pots)}"), height=6, title="[bold yellow]table[/bold yellow]",style="yellow"), justify="center",min_width=120)
 
     
 
@@ -150,7 +148,8 @@ def timer(console,game,tmm):
     keyboard.block_key("r")
     tm=tmm*100
     with Live(print_choice(game.current_player,game.bet,game.coin[game.current_player],tmm),refresh_per_second=4) as live:
-        
+        if game.coin[game.current_player]<=0:
+                return "check"
         while tm >= 0:
             
             if keyboard.is_pressed("r") and game.coin[game.current_player]>game.bet: 
