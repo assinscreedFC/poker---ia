@@ -5,8 +5,6 @@ import keyboard # type: ignore
 from rich.live import Live
 from rich.prompt import Prompt
 import time
-import asyncio
-
 
 
 def intro_jeu(console):
@@ -43,7 +41,7 @@ def creation_terrain_de_jeu(console,game):
             Panel(
                 Text("\n ")+ prerty_card_print(game.hand_of_players[i])+Text("\n\n")+Text(f"jeton: {game.coin[i]}"),
                 height=6,
-                title=f"[bold {colors[i]}]player {i+1} {"D" if i==game.who_is_who[0] else "SM" if i==game.who_is_who[1] else "BB" if i==game.who_is_who[2] else "" }[/bold {colors[i]}]", 
+                title=f"[bold {colors[i]}]player {i+1} {"D" if i==game.btn else "SM" if i==game.players[game.btn+1%len(game.players)] else "BB" if i==game.players[game.btn+2%len(game.players)] else "" }[/bold {colors[i]}]", 
                 style=f"{colors[i]}"  
             ),
             vertical="middle",
