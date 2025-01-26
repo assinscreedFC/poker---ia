@@ -19,12 +19,12 @@ class Game:
         self.bet=self.big_blind
         self.nb=[0,3,4,5] # pour savoir combien de carte sont sur la table a chaque tour pre-flop, flop, turn, river
         self.etape=0
-        self.info_players[0]["btn"]=True
-        self.info_players[1]["coin"]-=self.small_blind
-        self.info_players[2]["coin"]-=self.big_blind
-        self.pots[self.index_btn()+2]+=self.big_blind
-        self.pots[self.index_btn()+1]+=self.small_blind
-        self.current_player=self.index_btn()+3
+        self.info_players[5]["btn"]=True
+        self.info_players[0]["coin"]-=self.small_blind
+        self.info_players[1]["coin"]-=self.big_blind
+        self.pots[(self.index_btn()+2)%len(self.info_players)]+=self.big_blind
+        self.pots[(self.index_btn()+1)%len(self.info_players)]+=self.small_blind
+        self.current_player=(self.index_btn()+3)%len(self.info_players)
     
     def convert(self,nbr):
         # Fonction pour convertir une valeur en float ou en int
@@ -70,18 +70,20 @@ class Game:
                 self.stop_to_player=1
                 
     def increment(self):
+        # fonction pour calculer le nombre de joueur apres le dernier raise ou le under the gun
         self.stop_to_player+=1
     def nbr_current_player(self):
-        # Fonction pour retourner le nombre du joueur actuel
+        # Fonction pour retourner le nombre du joueur actuel qui n'ont pas fold
         return sum(1 for player in self.info_players if len(player["hand"]) != 0)
         
     def check_if_stop_rounde(self):
         # Fonction pour vérifier si le tour est terminé
-        print(f"stop {self.stop_to_player}")
-        print(self.nbr_current_player())
+        # print(f"stop {self.stop_to_player}")
+        # print(self.nbr_current_player())
         return self.stop_to_player==self.nbr_current_player()
     def next_etape(self):
         # Fonction pour passer à l'étape suivante
+        #au poker qaunnd on a plus que deux joueur a l'etape 1 l'under the gun jouer puis le bouton a chaque etape suivante en premier
         if len(self.info_players)==2 :
             if self.etape==1:
                 self.current_player=(self.index_btn()+1)%len(self.info_players)
@@ -106,6 +108,7 @@ class Game:
                             for index, player in enumerate(self.info_players)
                             if len(player["hand"]) != 0
                         ]
+        #parcours la liste des pots et donne le pot au joueur qui a la meilleur main dans le pot
         for pot in self.pots:
             score_each_player_in_pot=[(index,score) 
                                       for index,score in score_each_player if index in pot['players']]
@@ -117,6 +120,17 @@ class Game:
         #au poker on peut avoir plusieurs potss si un joueur n'a pas assez de jeton pour suivre cette fonction calcul les potss
         index_bets=[(index,bet) for index,bet in enumerate(self.pots) if bet>0]
         pots=[]
+        #cree plusieurs pots si un joueur n'a pas assez de jeton pour suivre
+        #pots est une liste de dictionnaire contenant le montant du pot et les joueurs qui ont contribué
+        """
+            il ya autant de pots differents que de valeur different dans self.pots
+            chaque pot contient le montant du pot et les joueurs qui ont contribué
+            un joueur contribue a un pot si il a misé une valeur superieur ou egale a la valeur minimale des mises des joueurs
+            dans le pot
+            et a chaque fois on retire la valeur minimale des mises des joueurs dans le pot
+            et on recalcule les pots
+            jusqua ce que toute les valeurs dans self.pots soient nulles
+        """
         while len(index_bets)!=0:
             pot=0
             involved_players = []
@@ -132,6 +146,7 @@ class Game:
         return pots
     
     def next_btn(self):
+        # passer le bouton au joueur suivant sur la table
         index_btn=self.index_btn()
         self.info_players[index_btn].update({"btn":False})
         index_btn=(index_btn+1)%len(self.info_players)
@@ -139,9 +154,7 @@ class Game:
             index_btn=(index_btn+1)%len(self.info_players)
         self.info_players[index_btn].update({"btn": True})
     def init(self):
-        # Fonction pour initialiser le jeu
-        # Supprimer les joueurs de self.players
-
+        
         self.next_btn()
         self.info_players=[player for player in self.info_players if player["coin"]>0]
         self.pots=[0 for _ in range(len(self.info_players))]
@@ -152,14 +165,10 @@ class Game:
             player["hand"] = self.deck.draw(2)
         self.bet=self.big_blind
         self.stop_to_player=0
-        # self.btn=self.btn+1 if self.btn<len(self.players)-1 else 0
         self.info_players[(self.index_btn()+1)%len(self.info_players)]["coin"]-=self.small_blind
         self.info_players[(self.index_btn()+2)%len(self.info_players)]["coin"]-=self.big_blind
+        self.pots[(self.index_btn()+1)%len(self.info_players)]+=self.big_blind
+        self.pots[(self.index_btn()+1)%len(self.info_players)]+=self.small_blind
         self.current_player=(self.index_btn()+3)%len(self.info_players)
 
-    # def calcule_du_prochain(self,nbr):
-    #     # Fonction pour calculer le prochain joueur BB, SB, BTN
-    #     index=self.who_is_who[nbr]
-    #     index=self.players.index(index)
-    #     index=index+1 if index<len(self.players)-1 else 0
-    #     return index
+    
