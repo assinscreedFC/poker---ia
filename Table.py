@@ -36,12 +36,12 @@ def creation_terrain_de_jeu(console,game):
     # Définir les couleurs pour chaque joueur
     colors = ["red", "blue", "green", "magenta", "cyan", "white"]
 
-    for i in range(len(game.players)):  # 6 cellules
+    for i in range(len(game.info_players)):  # 6 cellules
         table1.add_column(
             Panel(
-                Text("\n ")+ prerty_card_print(game.hand_of_players[i])+Text("\n\n")+Text(f"jeton: {game.coin[i]}"),
+                Text("\n ")+ prerty_card_print(game.info_players[i]["hand"])+Text("\n\n")+Text(f"jeton: {game.info_players[i]["coin"]}"),
                 height=6,
-                title=f"[bold {colors[i]}]player {i+1} {"D" if i==game.btn else "SM" if i==game.players[game.btn+1%len(game.players)] else "BB" if i==game.players[game.btn+2%len(game.players)] else "" }[/bold {colors[i]}]", 
+                title=f"[bold {colors[i]}]player {i+1} {"D" if i==game.index_btn() else "SM" if i==(game.index_btn()+1)%len(game.info_players) else "BB" if i==(game.index_btn()+2)%len(game.info_players)  else "" }[/bold {colors[i]}]", 
                 style=f"{colors[i]}"  
             ),
             vertical="middle",
@@ -135,7 +135,6 @@ def place_the_bet(console,game):
 
         nbr=Prompt.ask("entrer une valeur reel positif s'il vous plait superieur strictement a la dernier mise",default="0")
         console.clear()
-        more=nbr
 
     return nbr
     
@@ -145,12 +144,12 @@ def timer(console,game,tmm):
     more=""
     keyboard.block_key("r")
     tm=tmm*100
-    with Live(print_choice(game.current_player,game.bet,game.coin[game.current_player],tmm),refresh_per_second=4) as live:
-        if game.coin[game.current_player]<=0:
+    with Live(print_choice(game.current_player,game.bet,game.info_players[game.current_player]["coin"],tmm),refresh_per_second=4) as live:
+        if game.info_players[game.current_player]["coin"]<=0:
                 return "check"
         while tm >= 0:
             
-            if keyboard.is_pressed("r") and game.coin[game.current_player]>game.bet: 
+            if keyboard.is_pressed("r") and game.info_players[game.current_player]["coin"]>game.bet: 
                 while keyboard.is_pressed("r"):
                     pass
                 keyboard.unblock_key("r")
@@ -159,7 +158,7 @@ def timer(console,game,tmm):
                 
                 return place_the_bet(console,game)
 
-            if keyboard.is_pressed("a") and game.coin[game.current_player]<=game.bet:
+            if keyboard.is_pressed("a") and game.info_players[game.current_player]["coin"]<game.bet:
                 more="all"
                 stop_live(live)
                 return "all"
@@ -169,7 +168,7 @@ def timer(console,game,tmm):
                 stop_live(live)
 
                 return "fold"
-            if keyboard.is_pressed("c") and more!="call\n":
+            if keyboard.is_pressed("c") and more!="call\n" and game.info_players[game.current_player]["coin"]>=game.bet:
                 more="call\n"
                 stop_live(live)
                 return "call"
@@ -179,7 +178,7 @@ def timer(console,game,tmm):
                 return "check"
 
             if tm%100==0:
-                live.update(print_choice(game.current_player,game.bet,game.coin[game.current_player],tmm,more),refresh=True)
+                live.update(print_choice(game.current_player,game.bet,game.info_players[game.current_player]["coin"],tmm,more),refresh=True)
                 tmm-=1
             
             time.sleep(1/100)
