@@ -78,23 +78,24 @@ def print_choice(player,bet,coin,tm,more_text=None):
     return table2
 
 #---------------------------------fonction pour afficher les cartes jolie---------------------------------
-
+#les constantes pour les cartes
 INT_SUIT_TO_CHAR_SUIT = 'xshxdxxxc'
 STR_RANKS = '23456789TJQKA'
+
+#dans deuces les carte sont representé en binnaire donc pour les afficher il faut les convertir en string
 def iint_to_str(card_int):
         rank_int = gget_rank_int(card_int)
         suit_int = gget_suit_int(card_int)
         return STR_RANKS[rank_int] + INT_SUIT_TO_CHAR_SUIT[suit_int]
-
+#permet de recuperer la valeur de la carte
 def gget_rank_int(card_int):
         return (card_int >> 8) & 0xF
 
-    
+#permet de recuperer la couleur de la carte  
 def gget_suit_int(card_int):
         return (card_int >> 12) & 0xF
 
-
-#couleurs = {"h": "red", "d": "red", "c": "green", "s": "blue"}
+#permet d'afficher les cartes en couleur
 def afficher_carte(valeur, couleur):
     symboles = {"h": "♥", "d": "♦", "c": "♣", "s": "♠"}
     couleurs = {"h": "red", "d": "black", "c": "green", "s": "blue"}
@@ -103,7 +104,7 @@ def afficher_carte(valeur, couleur):
     texte = Text(f"{valeur} {symboles[couleur]}", style=couleurs[couleur])
     return texte
 
-
+#creet un texte avec | entre chaque carte
 def prerty_card_print(hand):
     str_cards= [iint_to_str(card) for card in hand]
     content= [afficher_carte(card[0],card[1]) for card in str_cards]
