@@ -51,7 +51,7 @@ def creation_terrain_de_jeu(console,game):
     
     table2 = Table(box=None)
 
-    table2.add_column(Panel(Text("\n") + prerty_card_print(game.table[i] for i in range(game.nb[game.etape]) )+Text("\n\n")+Text(f"pots: {sum(game.pots)}"), height=6, title="[bold yellow]table[/bold yellow]",style="yellow"), justify="center",min_width=120)
+    table2.add_column(Panel(Text("\n") + prerty_card_print(game.table[i] for i in range(game.nb[game.etape]) )+Text("\n\n")+Text(f"pots: {sum(game.pots.values())}"), height=6, title="[bold yellow]table[/bold yellow]",style="yellow"), justify="center",min_width=120)
 
     
 
