@@ -36,7 +36,10 @@ def main():
             console.clear()
             console.print(Text("au revoir !"), justify="center" ,style="bold red")
             return
-        
+        if len(game.info_players)==1:
+            Table.print_winner(console,game.info_players[0]["index"])
+            
+            return
         
         
         choice= Table.timer(console,game,TIME_OF_ROUNDE)

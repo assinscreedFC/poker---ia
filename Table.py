@@ -190,3 +190,12 @@ def stop_live(live):
     live.update("",refresh=True)
     live.stop()
     live.console.clear()
+
+def print_winner(console,winner):
+    table2 = Table(box=None)
+
+    table2.add_column(Panel(Text("\n") + Text(f"the winner is player {winner}"), height=6, title="[bold yellow]table[/bold yellow]",style="yellow"), justify="center",min_width=120)
+    console.clear()
+    console.print(table2, justify="center")
+
+    
