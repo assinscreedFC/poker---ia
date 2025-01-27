@@ -71,7 +71,7 @@ class Game:
             self.increment()   
                 
         elif choice=="all":
-                self.pots[self.self.index_current_player()]+=self.info_players[self.current_player]["coin"]
+                self.pots[self.index_current_player()]+=self.info_players[self.current_player]["coin"]
                 self.info_players[self.current_player]["coin"]=0
                 self.increment()
 
