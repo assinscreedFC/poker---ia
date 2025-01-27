@@ -3,28 +3,44 @@ from deuces import Evaluator # type: ignore
 
 class Game:
 
-    def __init__(self,players=[1,2,3,4,5,6]):
-        self.deck = Deck()
-        self.table = self.deck.draw(5)
-         
-        #pour avoir les cartes de chaque joueur
-        #self.info_players contient les informations de chaque joueur notamment son index, ses cartes et ses jetons
-        self.info_players = [{"index": index, "hand": self.deck.draw(2), "coin": 1000 ,"btn":False} for index in players]
+    def __init__(self, players=[1, 2, 3, 4, 5, 6]):
+        # Initialisation du jeu
+        self.deck = Deck()  # Création d'un nouveau paquet de cartes
+        self.table = self.deck.draw(5)  # Les 5 cartes de la table (flop, turn, river)
 
-         #pour savoir qui est le bouton , le small blind btn+1 et la big blind btn+2
-        self.big_blind=10
-        self.small_blind=5
-        self.pots = {index:0 for index in players} #pour avoir le pots de chaque joueur
-        self.stop_to_player=0
-        self.bet=self.big_blind
-        self.nb=[0,3,4,5] # pour savoir combien de carte sont sur la table a chaque tour pre-flop, flop, turn, river
-        self.etape=0
-        self.info_players[len(players) - 1]["btn"]=True
-        self.info_players[self.index_sb()]["coin"]-=self.small_blind
-        self.info_players[(self.index_bb())]["coin"]-=self.big_blind
-        self.pots[self.info_players[self.index_bb()]["index"]]+=self.big_blind
-        self.pots[self.info_players[self.index_sb()]["index"]]+=self.small_blind
-        self.current_player=self.index_utg()
+        # Informations des joueurs : un dictionnaire pour chaque joueur avec son index, sa main, ses jetons et son statut
+        self.info_players = [
+            {"index": index, "hand": self.deck.draw(2), "coin": 1000, "btn": False}
+            for index in players
+        ]
+
+        # Définition des blinds
+        self.big_blind = 10  # Valeur de la big blind
+        self.small_blind = 5  # Valeur de la small blind
+
+        # Pots pour suivre les mises de chaque joueur, initialement à 0
+        self.pots = {index: 0 for index in players}
+
+        # Autres paramètres de jeu
+        self.stop_to_player = 0  # Nombre de joueurs qui se sont arrêtés dans ce tour
+        self.bet = self.big_blind  # Mise minimum actuelle
+        self.nb = [0, 3, 4, 5]  # Nombre de cartes visibles sur la table à chaque étape (préflop, flop, turn, river)
+        self.etape = 0  # Étape actuelle du jeu
+
+        # Attribution du bouton (dernier joueur dans la liste)
+        self.info_players[len(players) - 1]["btn"] = True
+
+        # Ajustement des jetons pour la small blind et la big blind
+        self.info_players[self.index_sb()]["coin"] -= self.small_blind
+        self.info_players[self.index_bb()]["coin"] -= self.big_blind
+
+        # Mise à jour des pots pour les blinds
+        self.pots[self.info_players[self.index_bb()]["index"]] += self.big_blind
+        self.pots[self.info_players[self.index_sb()]["index"]] += self.small_blind
+
+        # Détermination du premier joueur à jouer (Under the Gun, UTG)
+        self.current_player = self.index_utg()
+
     
     def convert(self,nbr):
         # Fonction pour convertir une valeur en float ou en int
@@ -120,7 +136,7 @@ class Game:
         score_each_player = [
                             (player["index"], evaluator.evaluate(self.table, player["hand"]))
                             for player in self.info_players
-                            if len(player["hand"]) != 0
+                            if len(player["hand"]) != 0 #pour ignorer les joueur qui on fold
                         ]
         #parcours la liste des pots et donne le pot au joueur qui a la meilleur main dans le pot
         for pot in self.pots:
