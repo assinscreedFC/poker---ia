@@ -155,6 +155,21 @@ class Game:
             if player["index"] == target_index:
                 player[key] += value
                 break
+    
+    def get_action(self):
+        action=[]
+        action.append("fold")
+        if self.bet==0:
+            action.append("check")
+        if self.info_players[self.current_player]["coin"]>=self.bet:
+            action.append("call")
+        if self.info_players[self.current_player]["coin"]<self.bet:
+            action.append("all")#all in
+        if self.info_players[self.current_player]["coin"]>self.bet:
+            action.append("raise")#pour raise il faut send le montant voulue sous forme de chaiine de caracter
+        
+        return action
+
 
     
     def calcul_des_pots(self):
