@@ -129,7 +129,15 @@ class MCCFRTrainer:
         # Pour chaque action possible
         for action in strategy:
             # Appliquer l'action dans le jeu.
-            self.game.choix_joueur(action)
+            if action=="raise":
+                if(self.game.bet*2<=self.game.info_players[self.game.current_player]["coin"]):
+                    self.game.choix_joueur(str(self.game.bet*2))
+                else:
+                    self.game.choix_joueur(str(self.game.bet+1))
+            else:
+                self.game.choix_joueur(action)
+            
+            
             self.game.next_player()
 
             # Copier le dictionnaire de probabilités pour la branche de l'action.

@@ -26,7 +26,7 @@ class Game:
         self.bet = self.big_blind  # Mise minimum actuelle
         self.nb = [0, 3, 4, 5]  # Nombre de cartes visibles sur la table à chaque étape (préflop, flop, turn, river)
         self.etape = 0  # Étape actuelle du jeu
-
+        self.nbr_fold=0
         # Attribution du bouton (dernier joueur dans la liste)
         self.info_players[len(players) - 1]["btn"] = True
 
@@ -82,6 +82,7 @@ class Game:
 
         if choice=="fold":
             self.info_players[self.current_player]["hand"]=[]
+            self.nbr_fold+=1
             
         elif choice=="check":
             self.increment()
@@ -141,8 +142,11 @@ class Game:
 
     def next_player(self):
         # Fonction pour passer au joueur suivant
-        self.current_player=(self.current_player+1)%len(self.info_players)
-        while len(self.info_players[self.current_player]["hand"])==0:
+        if self.nbr_current_player()==0:
+            self.stop_to_player=self.nbr_current_player()
+            return
+        while len(self.info_players[self.current_player]["hand"])==0 :
+            print("test")
             self.current_player=(self.current_player+1)%len(self.info_players)
 
 
@@ -233,6 +237,7 @@ class Game:
         self.info_players[index_btn].update({"btn": True})
     def init(self):
         
+        self.nbr_fold=0
         self.next_btn()
         self.info_players=[player for player in self.info_players if player["coin"]>0]
         self.pots={player["index"]:0 for player in self.info_players}
