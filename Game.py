@@ -1,6 +1,6 @@
 from deuces import Deck # type: ignore
 from deuces import Evaluator # type: ignore
-
+import copy
 class Game:
 
     def __init__(self, players=[1, 2, 3, 4, 5, 6]):
@@ -78,7 +78,7 @@ class Game:
         # Fonction pour gérer le choix du joueur
 
         joueur=self.current_player
-        self.history.append([self.info_players[joueur],joueur,self.etape,self.stop_to_player,self.bet])
+        self.history.append([copy.deepcopy(self.info_players[joueur]),joueur,self.etape,self.stop_to_player,self.bet])
 
         if choice=="fold":
             self.info_players[self.current_player]["hand"]=[]
@@ -112,7 +112,7 @@ class Game:
                 coin=self.info_players[current]["coin"]-player["coin"]
                 self.pots[current]-=coin
             self.etape=etap
-            self.info_players[current]=player
+            self.info_players[current]=copy.deepcopy(player)
             self.bet=bet
             self.current_player=current
             self.stop_to_player=stop
@@ -149,6 +149,7 @@ class Game:
 
     def check_winner_rounde(self):
         # Fonction pour vérifier le gagnant de la ronde et 
+        etas=[]
         evaluator= Evaluator()
         self.pots=self.calcul_des_pots()
         score_each_player = [
@@ -161,9 +162,10 @@ class Game:
             score_each_player_in_pot=[(index,score) 
                                       for index,score in score_each_player if index in pot['players']]
             winner = min(score_each_player_in_pot, key=lambda x: x[1])[0]
-
+            etas.append(winner,"coin",pot['amount'])
             self.update_player(winner,"coin",pot['amount'])
         self.init()
+        return etas
     
     def update_player(self, target_index, key, value):
         """

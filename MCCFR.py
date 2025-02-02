@@ -91,8 +91,6 @@ class MCCFRTrainer:
         Pour chaque itération, l'état du jeu est réinitialisé via la méthode d'initialisation (ici, on utilise game.init()).
         """
         for i in range(self.iterations):
-            # Réinitialiser le jeu pour une nouvelle simulation.
-            self.game.init()
             # Initialisation des probabilités de portée pour chaque joueur.
             # Les clés correspondent aux index des joueurs (player["index"]).
             pr = {player["index"]: 1.0 for player in self.game.info_players}
@@ -119,6 +117,7 @@ class MCCFRTrainer:
             if self.game.etape >= len(self.game.nb):
                 # Dans notre exemple, nous utilisons get_terminal_value() pour définir les utilités.
                 return self.get_terminal_value()
+            self.game.nbr_current_player()
         
         # Récupérer la stratégie courante pour cet info_set.
         strategy = self.get_strategy(info_set)
@@ -131,6 +130,8 @@ class MCCFRTrainer:
         for action in strategy:
             # Appliquer l'action dans le jeu.
             self.game.choix_joueur(action)
+            self.game.next_player()
+
             # Copier le dictionnaire de probabilités pour la branche de l'action.
             new_pr = pr.copy()
             new_pr[current_index] *= strategy[action]
@@ -160,7 +161,7 @@ if __name__ == '__main__':
     game = Game(players=[1, 2, 3, 4, 5, 6])
     
     # Créez l'entraîneur MCCFR avec par exemple 1000 itérations (pour la démo).
-    trainer = MCCFRTrainer(game, iterations=1000)
+    trainer = MCCFRTrainer(game, iterations=1)
     
     # Lancez l'entraînement.
     trainer.train()
