@@ -41,6 +41,8 @@ class Game:
         # Détermination du premier joueur à jouer (Under the Gun, UTG)
         self.current_player = self.index_utg()
 
+        self.history=[]
+
     
     def convert(self,nbr):
         # Fonction pour convertir une valeur en float ou en int
@@ -74,6 +76,10 @@ class Game:
     
     def choix_joueur(self,choice=""):
         # Fonction pour gérer le choix du joueur
+
+        joueur=self.current_player
+        self.history.append([self.info_players[joueur],joueur,self.etape,self.stop_to_player,self.bet])
+
         if choice=="fold":
             self.info_players[self.current_player]["hand"]=[]
             
@@ -98,7 +104,19 @@ class Game:
 
                 self.pots[self.index_current_player()]+=self.bet
                 self.stop_to_player=1
-                
+    
+    def undo_last_action(self):
+        if self.history:
+            player,current,etap,stop,bet=self.history.pop()
+            if self.info_players[current]["coin"]>player["coin"]:
+                coin=self.info_players[current]["coin"]-player["coin"]
+                self.pots[current]-=coin
+            self.etape=etap
+            self.info_players[current]=player
+            self.bet=bet
+            self.current_player=current
+            self.stop_to_player=stop
+
     def increment(self):
         # fonction pour calculer le nombre de joueur apres le dernier raise ou le under the gun
         self.stop_to_player+=1
