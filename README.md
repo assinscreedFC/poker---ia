@@ -13,7 +13,7 @@ La prochaine étape consiste à développer l'IA en utilisant **Monte Carlo Coun
 1. Assurez-vous d'avoir **Python 3.12** installé sur votre système.
 2. Clonez ce dépôt :
    ```sh
-   git clone https://github.com/votre-utilisateur/poker-ai.git
+   git clone https://github.com/assinscreedFC/poker---ia.git
    cd poker-ai
    ```
 3. Installez les dépendances :
