@@ -2,3 +2,4 @@ videomaker.py
 env
 __pycache__
 t*.py
+.qodo
